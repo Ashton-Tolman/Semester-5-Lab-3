@@ -54,23 +54,44 @@ Setup:
     BCF  0x03, 6    ;
     BCF  0x03, 5    ; Set bank 0 active
     CLRF 0x06	    ; Clear portB
-    CLRF 0x07	    ; Clear portC
+    MOVLW 0x30      ; Select the character set for display 0
+    MOVWF 0x07      ; Send W to PortC
 		    ; OPTION_REG RBPU-not is default high meaning disabled
 		    ; IOCB portB interrupt-on-change disabled default
 		    ; 	
     goto Main
     
-count    EQU 0x20   ;use data memory address 0x20 as an 8-bit loop counter  
-
+mainCount    EQU 0x20   ;use data memory address 0x20 as an 8-bit loop counter  
+outCount    EQU 0x21	;use data memory address 0x21 as an 8-bit loop counter  
+inCount    EQU 0x22	;use data memory address 0x22 as an 8-bit loop counter  
+    
 Main:
-    MOVLW 0x01      ;1 TCY code not part of delay
-    XORWF 0x06,1    ;1 TCY code not part of delay
+    MOVLW 0x01		;1 TCY Set the bit to be toggled by XOR
+    XORWF 0x06,1	;1 TCY Toggle RB0
 
-    MOVLW 0x0F      ;1 TCY delay overhead
-    MOVWF count     ;1 TCY delay overhead
-Delay:                     
-    DECFSZ count,1  ;1(2) 1 TCY if not zero, 2 TCY if zero
-    goto Delay	    ;2 TCY
+    MOVLW 0x05		;1 TCY set the lower bits to 5. Upper bits unaffected by XOR
+    XORWF 0x07,1	;1 TCY toggle between 5 & 0
+    
+    MOVLW 0x0F		;1 TCY delay overhead
+    MOVWF mainCount	;1 TCY delay overhead
+    
+MainDelay:
+    MOVLW 0x0F		;1 TCY delay overhead
+    MOVWF outCount	;1 TCY delay overhead
+    
+OutDelay:
+    MOVLW 0x0F		;1 TCY delay overhead
+    MOVWF inCount	;1 TCY delay overhead
+    
+InDelay:                     
+    DECFSZ inCount,1	;1(2) 1 TCY if not zero, 2 TCY if zero
+    goto InDelay	;2 TCY
+    
+    DECFSZ outCount,1	;1(2) 1TCY if not zero, 2 TCY if zero
+    goto OutDelay	;2 TCY
+    
+    DECFSZ mainCount,1	;1(2) 1TCY if not zero, 2 TCY if zero
+    goto MainDelay	;2 TCY
 
-    goto   Main	    ;2 TCY code not part of delay
+    goto   Main		;2 TCY code not part of delay
 End
