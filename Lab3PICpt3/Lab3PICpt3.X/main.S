@@ -69,21 +69,22 @@ Main:
     MOVLW 0x01		;1 TCY Set the bit to be toggled by XOR
     XORWF 0x06,1	;1 TCY Toggle RB0
 
+    
     MOVLW 0x05		;1 TCY set the lower bits to 5. Upper bits unaffected by XOR
     XORWF 0x07,1	;1 TCY toggle between 5 & 0
     
-    MOVLW 0x0F		;1 TCY delay overhead
+    MOVLW 0x06		;1 TCY delay overhead
     MOVWF mainCount	;1 TCY delay overhead
     
 MainDelay:
-    MOVLW 0x0F		;1 TCY delay overhead
+    MOVLW 0x81		;1 TCY delay overhead
     MOVWF outCount	;1 TCY delay overhead
     
 OutDelay:
-    MOVLW 0x0F		;1 TCY delay overhead
+    MOVLW 0xD6		;1 TCY delay overhead
     MOVWF inCount	;1 TCY delay overhead
     
-InDelay:                     
+InDelay:    
     DECFSZ inCount,1	;1(2) 1 TCY if not zero, 2 TCY if zero
     goto InDelay	;2 TCY
     
